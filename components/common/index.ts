@@ -4,7 +4,6 @@
 export {
   DataTable,
   DataTableActionsDropdown,
-  DataTableLoading,
   DataTableError,
   DataTableEmpty,
   type DataTableProps,

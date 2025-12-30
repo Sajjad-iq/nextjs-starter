@@ -3,26 +3,26 @@ import type { FormConfig } from '@/components/form';
 import type { TFunction } from 'i18next';
 
 // Validation schema factory
-export const createRegisterFormSchema = (t: TFunction) => z
+export const createRegisterFormSchema = (t: TFunction<'auth'>) => z
   .object({
     name: z
       .string()
-      .min(3, t('auth.validation.nameMinLength'))
-      .max(255, t('auth.validation.nameMaxLength')),
+      .min(3, t('validation.nameMinLength'))
+      .max(255, t('validation.nameMaxLength')),
     email: z
-      .string({ required_error: t('auth.validation.emailRequired') })
-      .min(1, t('auth.validation.emailRequired'))
-      .email(t('auth.validation.emailInvalid')),
+      .string()
+      .min(1, t('validation.emailRequired'))
+      .email(t('validation.emailInvalid')),
     phone: z.string().optional(),
     phoneCode: z.string().optional(),
     password: z
       .string()
-      .min(8, t('auth.validation.passwordMinLength'))
-      .max(100, t('auth.validation.passwordMaxLength')),
+      .min(8, t('validation.passwordMinLength'))
+      .max(100, t('validation.passwordMaxLength')),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: t('auth.validation.passwordsDontMatch'),
+    message: t('validation.passwordsDontMatch'),
     path: ['confirmPassword'],
   });
 
@@ -31,21 +31,21 @@ export type RegisterFormValues = z.infer<ReturnType<typeof createRegisterFormSch
 // Form configuration
 export const createRegisterFormConfig = (
   onSubmit: (values: RegisterFormValues) => Promise<void>,
-  t: TFunction
+  t: TFunction<'auth'>
 ): FormConfig => ({
   fields: [
     {
       name: 'name',
       type: 'text',
-      label: t('auth.fields.name.label'),
-      placeholder: t('auth.fields.name.placeholder'),
+      label: t('fields.name.label'),
+      placeholder: t('fields.name.placeholder'),
       required: true,
     },
     {
       name: 'email',
       type: 'email',
-      label: t('auth.fields.email.label'),
-      placeholder: t('auth.fields.email.placeholder'),
+      label: t('fields.email.label'),
+      placeholder: t('fields.email.placeholder'),
       required: true,
     },
     {
@@ -57,23 +57,23 @@ export const createRegisterFormConfig = (
     {
       name: 'phone',
       type: 'phone',
-      label: t('auth.fields.phone.label'),
-      placeholder: t('auth.fields.phone.placeholder'),
+      label: t('fields.phone.label'),
+      placeholder: t('fields.phone.placeholder'),
       required: false,
       defaultCountry: 'IQ',
     },
     {
       name: 'password',
       type: 'password',
-      label: t('auth.fields.password.label'),
-      placeholder: t('auth.fields.password.placeholder'),
+      label: t('fields.password.label'),
+      placeholder: t('fields.password.placeholder'),
       required: true,
     },
     {
       name: 'confirmPassword',
       type: 'password',
-      label: t('auth.fields.confirmPassword.label'),
-      placeholder: t('auth.fields.confirmPassword.placeholder'),
+      label: t('fields.confirmPassword.label'),
+      placeholder: t('fields.confirmPassword.placeholder'),
       required: true,
     },
   ],
@@ -87,7 +87,7 @@ export const createRegisterFormConfig = (
     confirmPassword: '',
   },
   onSubmit,
-  submitText: t('auth.buttons.createAccount'),
-  loadingText: t('auth.buttons.creatingAccount'),
+  submitText: t('buttons.createAccount'),
+  loadingText: t('buttons.creatingAccount'),
   submitButtonClass: 'w-full',
 });

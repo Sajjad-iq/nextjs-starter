@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import type { PaginationParams } from '@/types/global';
-import type { ServerPaginationState } from '@/components/common/dataTable';
+import type { ServerPaginationState } from '@/components/dataTable';
 
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 20;

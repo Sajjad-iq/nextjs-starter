@@ -1,37 +1,19 @@
-import axios, { type AxiosInstance, type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { toast } from 'sonner';
-import { ErrorHandler } from '@/utils/errorHandler';
-
-const DEFAULT_PAGE_SIZE = 20;
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 /**
- * HTTP Service - Singleton pattern for Axios configuration
- *
- * Features:
- * - HTTP-only cookie-based authentication
- * - Automatic X-Organization-ID header injection
- * - Automatic pagination params from URL (page, size) for GET requests
- * - Automatic 401 error handling
- * - Global error toast notifications using ErrorHandler
- * - Request/Response interceptors
- * - Configurable base URL from environment
+ * Simple HTTP Service for Next.js
+ * Handles API requests with cookie-based authentication
  */
 class HttpService {
   private axiosInstance: AxiosInstance;
-  private unauthorizedCallback: (() => void) | null = null;
-  private isRedirecting = false;
 
   constructor() {
-    // Get base URL from environment or use default
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083/api';
-
-    // Create Axios instance with default configuration
     this.axiosInstance = axios.create({
-      baseURL,
-      timeout: 10000,
-      withCredentials: true, // CRITICAL: Send HTTP-only cookies with every request
+      baseURL: this.getBaseURL(),
+      timeout: 30000,
+      withCredentials: true, // Enable cookies
       headers: {
-        'Accept-Language': 'ar-IQ', // Default language header
+        'Content-Type': 'application/json',
       },
     });
 
@@ -39,128 +21,58 @@ class HttpService {
   }
 
   /**
-   * Setup request and response interceptors
+   * Get base URL based on environment
+   */
+  private getBaseURL(): string {
+    // Server-side: use full URL
+    if (typeof window === 'undefined') {
+      return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+    }
+    // Client-side: use relative URL
+    return '/api';
+  }
+
+  /**
+   * Setup interceptors for auth and error handling
    */
   private setupInterceptors(): void {
-    // Request interceptor
+    // Request interceptor - add auth token
     this.axiosInstance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        // No manual token handling - cookies are automatically sent
-
-        // Add X-Organization-ID header if organization is selected and not auth endpoint
-        const isAuthEndpoint = config.url?.includes('/auth/');
-        if (!isAuthEndpoint) {
-          const selectedOrgId = localStorage.getItem('selected_organization_id');
-          if (selectedOrgId) {
-            config.headers['X-Organization-ID'] = selectedOrgId;
+        // Add token from localStorage (client-side only)
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('auth_token');
+          if (token && config.headers) {
+            config.headers.Authorization = `Bearer ${token}`;
           }
         }
-
-        // Auto-attach pagination params from URL for GET requests
-        if (config.method?.toLowerCase() === 'get') {
-          this.attachPaginationParams(config);
-        }
-
         return config;
       },
-      (error: AxiosError) => {
-        return Promise.reject(error);
-      }
+      (error: AxiosError) => Promise.reject(error)
     );
 
-    // Response interceptor
+    // Response interceptor - handle errors
     this.axiosInstance.interceptors.response.use(
-      (response) => {
-        // Reset redirecting flag on successful response
-        this.isRedirecting = false;
-        return response;
-      },
+      (response) => response,
       (error: AxiosError) => {
-        // Handle 401 Unauthorized errors
-        if (error.response?.status === 401) {
-          if (!this.isRedirecting) {
-            const isAuthOperation = error.config?.url?.includes('/auth/validate-token');
-
-            if (isAuthOperation && this.unauthorizedCallback && !window.location.pathname.startsWith("/auth")) {
-              this.isRedirecting = true;
-              this.unauthorizedCallback();
-              // Reset flag after a delay to allow for re-login
-              setTimeout(() => {
-                this.isRedirecting = false;
-              }, 1000);
-            }
-          }
+        // Handle 401 Unauthorized (client-side only)
+        if (error.response?.status === 401 && typeof window !== 'undefined') {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('current_user');
+          window.location.href = '/auth/login';
         }
-
-        // Global error toast handling using ErrorHandler
-        // Extract and format error message from backend response
-
-        const apiError = ErrorHandler.handleApiError(error);
-        const errorMessage = ErrorHandler.getErrorMessage(apiError);
-
-        if (errorMessage) {
-          toast.error(errorMessage);
-        }
-
         return Promise.reject(error);
       }
     );
   }
 
   /**
-   * Attach pagination params from browser URL to the request
-   * Only adds params if not already present in the request URL
+   * Get axios instance
    */
-  private attachPaginationParams(config: InternalAxiosRequestConfig): void {
-    // Skip if URL already has pagination params
-    if (config.url?.includes('page=') || config.url?.includes('size=')) {
-      return;
-    }
-
-    // Skip auth endpoints and specific non-paginated endpoints
-    const skipEndpoints = ['/auth/', '/media/', '/upload'];
-    if (skipEndpoints.some(endpoint => config.url?.includes(endpoint))) {
-      return;
-    }
-
-    // Get pagination from browser URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page');
-    const size = urlParams.get('size');
-
-    // Build params object
-    const params = config.params || {};
-
-    // Only add pagination if at least one param exists in URL or use defaults for list endpoints
-    if (page !== null || size !== null) {
-      params.page = page !== null ? parseInt(page, 10) : 0;
-      params.size = size !== null ? parseInt(size, 10) : DEFAULT_PAGE_SIZE;
-      config.params = params;
-    }
-  }
-
-  /**
-   * Register callback to handle unauthorized (401) errors
-   * Called by App component to handle session expiry
-   */
-  setUnauthorizedCallback(callback: () => void): void {
-    this.unauthorizedCallback = callback;
-  }
-
-  /**
-   * Get the configured Axios instance for making API calls
-   */
-  getAxiosInstance(): AxiosInstance {
+  public getAxiosInstance(): AxiosInstance {
     return this.axiosInstance;
-  }
-
-  /**
-   * Reset the redirecting flag (used after successful re-authentication)
-   */
-  resetRedirectingFlag(): void {
-    this.isRedirecting = false;
   }
 }
 
-// Export singleton instance
+// Export singleton
 export const httpService = new HttpService();

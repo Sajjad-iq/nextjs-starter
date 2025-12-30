@@ -9,7 +9,7 @@ export {
   type DataTableProps,
   type ActionItem,
   type ActionGroup,
-} from "./dataTable"
+} from "../dataTable"
 export { Spinner } from "./Spinner"
 export { EmptyState } from "./EmptyState"
 export { ErrorState } from "./ErrorState"

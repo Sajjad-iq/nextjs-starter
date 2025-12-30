@@ -3,12 +3,12 @@ import type { FormConfig } from '@/components/form';
 import type { TFunction } from 'i18next';
 
 // Validation schema factory
-export const createLoginFormSchema = (t: TFunction) => z.object({
-  emailOrPhone: z.string().min(1, t('auth.validation.emailOrPhoneRequired')),
+export const createLoginFormSchema = (t: TFunction<'auth'>) => z.object({
+  emailOrPhone: z.string().min(1, t('validation.emailOrPhoneRequired')),
   password: z
     .string()
-    .min(8, t('auth.validation.passwordMinLength'))
-    .max(100, t('auth.validation.passwordMaxLength')),
+    .min(8, t('validation.passwordMinLength'))
+    .max(100, t('validation.passwordMaxLength')),
 });
 
 export type LoginFormValues = z.infer<ReturnType<typeof createLoginFormSchema>>;
@@ -16,21 +16,21 @@ export type LoginFormValues = z.infer<ReturnType<typeof createLoginFormSchema>>;
 // Form configuration
 export const createLoginFormConfig = (
   onSubmit: (values: LoginFormValues) => Promise<void>,
-  t: TFunction
+  t: TFunction<'auth'>
 ): FormConfig => ({
   fields: [
     {
       name: 'emailOrPhone',
       type: 'text',
-      label: t('auth.fields.emailOrPhone.label'),
-      placeholder: t('auth.fields.emailOrPhone.placeholder'),
+      label: t('fields.emailOrPhone.label'),
+      placeholder: t('fields.emailOrPhone.placeholder'),
       required: true,
     },
     {
       name: 'password',
       type: 'password',
-      label: t('auth.fields.password.label'),
-      placeholder: t('auth.fields.password.placeholder'),
+      label: t('fields.password.label'),
+      placeholder: t('fields.password.placeholder'),
       required: true,
     },
   ],
@@ -40,7 +40,7 @@ export const createLoginFormConfig = (
     password: '',
   },
   onSubmit,
-  submitText: t('auth.buttons.signIn'),
-  loadingText: t('auth.buttons.signingIn'),
+  submitText: t('buttons.signIn'),
+  loadingText: t('buttons.signingIn'),
   submitButtonClass: 'w-full',
 });

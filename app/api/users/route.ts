@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock users data
-const mockUsers = Array.from({ length: 50 }, (_, i) => ({
+const mockUsers = Array.from({ length: 100 }, (_, i) => ({
     id: `user-${i + 1}`,
     name: `User ${i + 1}`,
     email: `user${i + 1}@example.com`,

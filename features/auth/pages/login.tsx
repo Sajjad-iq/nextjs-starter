@@ -34,7 +34,7 @@ export default function LoginPage() {
                         type="button"
                         variant="link"
                         size="sm"
-                        onClick={() => router.push('/auth/register')}
+                        onClick={() => router.push('/register')}
                         className="px-0 h-auto"
                     >
                         {t('login.signUp')}

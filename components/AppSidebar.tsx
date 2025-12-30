@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Home, Users, Settings, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
     Sidebar,
@@ -23,9 +23,9 @@ const menuItems = [
         icon: Home,
     },
     {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutDashboard,
+        title: 'Users',
+        url: '/users',
+        icon: Users,
     },
     {
         title: 'Settings',
@@ -41,7 +41,7 @@ export function AppSidebar() {
     const handleLogout = async () => {
         await authService.logout();
         clearSession();
-        router.push('/auth/login');
+        router.push('/login');
     };
 
     return (

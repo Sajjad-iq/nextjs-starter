@@ -5,12 +5,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { useTranslation } from "react-i18next"
+import { Inbox } from "lucide-react"
+import { EmptyState, ErrorState } from "@/components/common"
 import {
   DataTableToolbar,
   DataTableContent,
   DataTablePagination,
-  DataTableError,
-  DataTableEmpty,
 } from "./components"
 
 export interface ServerPaginationState {
@@ -48,6 +49,7 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   onRetry,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation('table')
   const isServerPagination = !!serverPagination && !!onPaginate
 
   const table = useReactTable({
@@ -79,8 +81,20 @@ export function DataTable<TData, TValue>({
   const totalElements = isServerPagination ? serverPagination.totalElements : data.length
 
   const renderContent = () => {
-    if (!isLoading && data.length === 0 && onRetry) return <DataTableError onRetry={onRetry} />
-    if (!isLoading && data.length === 0) return <DataTableEmpty />
+    if (!isLoading && data.length === 0 && onRetry) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <ErrorState error={t('error')} onRetry={onRetry} retryLabel={t('retry')} variant="compact" />
+        </div>
+      )
+    }
+    if (!isLoading && data.length === 0) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <EmptyState icon={Inbox} title={t('empty')} iconSize="md" />
+        </div>
+      )
+    }
     return <DataTableContent table={table} columns={columns} isLoading={isLoading} />
   }
 

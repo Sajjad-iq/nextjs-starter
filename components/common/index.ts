@@ -4,8 +4,6 @@
 export {
   DataTable,
   DataTableActionsDropdown,
-  DataTableError,
-  DataTableEmpty,
   type DataTableProps,
   type ActionItem,
   type ActionGroup,

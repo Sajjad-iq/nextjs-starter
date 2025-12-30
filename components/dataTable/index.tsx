@@ -6,9 +6,4 @@ export {
   DataTableContent,
   DataTablePagination,
   DataTablePageSize,
-  DataTableActionsDropdown,
-  DataTableError,
-  DataTableEmpty,
-  type ActionItem,
-  type ActionGroup,
 } from "./components"

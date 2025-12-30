@@ -1,3 +1,5 @@
+import type { ApiResponse } from '@/types/global';
+
 export interface User {
     id: string;
     name: string;
@@ -8,19 +10,27 @@ export interface User {
     createdAt: string;
 }
 
-export interface UsersResponse {
-    success: boolean;
-    data: {
-        content: User[];
-        page: number;
-        size: number;
-        totalElements: number;
-        totalPages: number;
-    };
+export interface UsersData {
+    content: User[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
 }
+
+export type UsersResponse = ApiResponse<UsersData>;
+export type UserResponse = ApiResponse<User>;
 
 export interface UsersParams {
     page: number;
     size: number;
     search?: string;
+}
+
+export interface UserFormValues {
+    name: string;
+    email: string;
+    phone?: string;
+    role: 'admin' | 'manager' | 'user';
+    status: 'active' | 'inactive';
 }

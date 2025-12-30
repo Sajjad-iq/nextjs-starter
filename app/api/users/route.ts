@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Mock users data
-const mockUsers = Array.from({ length: 100 }, (_, i) => ({
-    id: `user-${i + 1}`,
-    name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    phone: `+964 750${String(1000000 + i).slice(1)}`,
-    role: i % 3 === 0 ? 'admin' : i % 3 === 1 ? 'manager' : 'user',
-    status: i % 4 === 0 ? 'inactive' : 'active',
-    createdAt: new Date(Date.now() - i * 86400000).toISOString(),
-}));
+import { mockUsers } from './_data';
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
@@ -47,5 +37,31 @@ export async function GET(request: NextRequest) {
             totalElements,
             totalPages,
         },
+    });
+}
+
+// POST /api/users - Create user
+export async function POST(request: NextRequest) {
+    const body = await request.json();
+
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const newUser = {
+        id: `user-${Date.now()}`,
+        name: body.name,
+        email: body.email,
+        phone: body.phone || '',
+        role: body.role || 'user',
+        status: body.status || 'active',
+        createdAt: new Date().toISOString(),
+    };
+
+    mockUsers.unshift(newUser);
+
+    return NextResponse.json({
+        success: true,
+        message: 'User created successfully',
+        data: newUser,
     });
 }

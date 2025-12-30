@@ -9,11 +9,6 @@ import { SwitchField } from "../fields/SwitchField"
 import { RadioGroupField } from "../fields/RadioGroupField"
 import { PhoneInputField } from "../fields/PhoneInputField"
 import { ImageUploadField } from "../fields/ImageUploadField"
-import { CurrencySelectField } from "../fields/CurrencySelectField"
-import { CategorySelectField } from "../fields/CategorySelectField"
-import { InventorySelectField } from "../fields/InventorySelectField"
-import { WeightUnitSelectField } from "../fields/WeightUnitSelectField"
-import { GeneratedTextField } from "../fields/GeneratedTextField"
 import { DatePickerField } from "../fields/DatePickerField"
 
 // Import types
@@ -81,100 +76,6 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
         )
     }
 
-    // Currency select field
-    if (field.type === "currency-select") {
-        return (
-            <div key={field.name} className={field.containerClass}>
-                <FormField
-                    control={control}
-                    name={field.name}
-                    render={({ field: fieldProps }) => (
-                        <CurrencySelectField
-                            field={field}
-                            value={fieldProps.value}
-                            onChange={fieldProps.onChange}
-                            isLoading={isLoading}
-                        />
-                    )}
-                />
-            </div>
-        )
-    }
-
-    // Category select field
-    if (field.type === "category-select") {
-        return (
-            <div key={field.name} className={field.containerClass}>
-                <FormField
-                    control={control}
-                    name={field.name}
-                    render={({ field: fieldProps }) => (
-                        <CategorySelectField
-                            field={field}
-                            value={fieldProps.value}
-                            onChange={fieldProps.onChange}
-                            isLoading={isLoading}
-                        />
-                    )}
-                />
-            </div>
-        )
-    }
-
-    // Inventory select field
-    if (field.type === "inventory-select") {
-        return (
-            <div key={field.name} className={field.containerClass}>
-                <FormField
-                    control={control}
-                    name={field.name}
-                    render={({ field: fieldProps }) => (
-                        <InventorySelectField
-                            field={field}
-                            value={fieldProps.value}
-                            onChange={fieldProps.onChange}
-                            isLoading={isLoading}
-                        />
-                    )}
-                />
-            </div>
-        )
-    }
-
-    // Weight unit select field
-    if (field.type === "weight-unit-select") {
-        return (
-            <div key={field.name} className={field.containerClass}>
-                <FormField
-                    control={control}
-                    name={field.name}
-                    render={({ field: fieldProps }) => (
-                        <WeightUnitSelectField
-                            field={field}
-                            value={fieldProps.value}
-                            onChange={fieldProps.onChange}
-                            isLoading={isLoading}
-                        />
-                    )}
-                />
-            </div>
-        )
-    }
-
-    // Generated text field
-    if (field.type === "generated-text") {
-        return (
-            <div key={field.name} className={field.containerClass}>
-                <FormField
-                    control={control}
-                    name={field.name}
-                    render={({ field: fieldProps }) => (
-                        <GeneratedTextField field={fieldProps} config={field} />
-                    )}
-                />
-            </div>
-        )
-    }
 
     // Date picker field
     if (field.type === "date-picker") {

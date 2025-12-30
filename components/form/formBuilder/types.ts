@@ -1,4 +1,3 @@
-import type { MediaCategory } from "@/components/common/image-upload"
 import type z from "zod"
 
 
@@ -172,36 +171,6 @@ export interface ImageUploadFieldConfig extends BaseFieldConfig {
   ) => Promise<{ success: boolean; data?: { url: string }; error?: string }>
 }
 
-// Currency select field
-export interface CurrencySelectFieldConfig extends BaseFieldConfig {
-  type: "currency-select"
-  organizationId?: string
-}
-
-// Category select field
-export interface CategorySelectFieldConfig extends BaseFieldConfig {
-  type: "category-select"
-  organizationId?: string
-}
-
-// Inventory select field
-export interface InventorySelectFieldConfig extends BaseFieldConfig {
-  type: "inventory-select"
-  organizationId?: string
-}
-
-// Weight unit select field
-export interface WeightUnitSelectFieldConfig extends BaseFieldConfig {
-  type: "weight-unit-select"
-  organizationId?: string
-}
-
-// Generated text field with auto-generate button
-export interface GeneratedTextFieldConfig extends BaseFieldConfig {
-  type: "generated-text"
-  generateFn?: () => string
-  generateButtonText?: string
-}
 
 // Date picker field
 export interface DatePickerFieldConfig extends BaseFieldConfig {
@@ -226,11 +195,6 @@ export type FormFieldConfig =
   | SwitchFieldConfig
   | RadioFieldConfig
   | ImageUploadFieldConfig
-  | CurrencySelectFieldConfig
-  | CategorySelectFieldConfig
-  | InventorySelectFieldConfig
-  | WeightUnitSelectFieldConfig
-  | GeneratedTextFieldConfig
   | DatePickerFieldConfig
   | CustomFieldConfig
 
@@ -242,4 +206,20 @@ export interface FieldGroup {
   fields: FormFieldConfig[]
   defaultOpen?: boolean
   collapsible?: boolean
+}
+
+export enum MediaType {
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+  DOCUMENT = 'DOCUMENT',
+  AUDIO = 'AUDIO',
+}
+
+export enum MediaCategory {
+  PROFILE = 'PROFILE',
+  PRODUCT = 'PRODUCT',
+  ORGANIZATION = 'ORGANIZATION',
+  INVOICE = 'INVOICE',
+  DOCUMENT = 'DOCUMENT',
+  OTHER = 'OTHER',
 }

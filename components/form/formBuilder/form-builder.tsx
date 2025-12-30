@@ -1,216 +1,210 @@
+'use client';
+
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useFormContext } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation } from "@tanstack/react-query"
+import type z from "zod"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-} from "@/components/ui/form"
+import { Form, FormField } from "@/components/ui/form"
 import { Loader2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
-// Import components
-import { CollapsibleFieldGroup } from "./compoents/CollapsibleFieldGroup"
-import { FieldRenderer } from "./compoents/FieldRenderer"
+import { TextInputField } from "./fields/TextInputField"
+import { CheckboxField } from "./fields/CheckboxField"
+import { SwitchField } from "./fields/SwitchField"
+import { RadioGroupField } from "./fields/RadioGroupField"
+import { PhoneInputField } from "./fields/PhoneInputField"
+import { DatePickerField } from "./fields/DatePickerField"
+import { ImageUploadField } from "./fields/ImageUploadField"
 
-// Import types
-import type {
-  FormFieldConfig,
-  FormBuilderProps,
-} from "./types"
+// Loading context (only thing Form doesn't provide)
+const LoadingContext = React.createContext(false)
 
-// Import helpers
-import {
-  isFieldVisible as isFieldVisibleHelper,
-  createFormBuilderHandle,
-} from "./helpers"
+// Base field props
+interface FieldProps {
+  name: string
+  label?: string
+  placeholder?: string
+  description?: string
+  required?: boolean
+  disabled?: boolean
+}
 
-// Import custom hooks
-import {
-  useFormInitialValues,
-  useFormChangeWatcher,
-} from "./hooks"
-
-
-export const FormBuilder = React.forwardRef<
-  {
-    resetForm: () => void
-    setFieldValue: (name: string, value: any) => void
-    setValues: (values: Record<string, any>) => void
-    validate: () => Promise<{ valid: boolean; errors: any }>
-    values: Record<string, any>
-    errors: any
-    submit: () => Promise<void>
-  },
-  FormBuilderProps
->(({ config, loading = false, onSubmit, onCancel, onError, children }, ref) => {
-  const { t } = useTranslation('form')
-
-  const form = useForm<Record<string, any>>({
-    // @ts-ignore - zodResolver type compatibility with optional schema
-    resolver: config.validationSchema ? zodResolver(config.validationSchema) : undefined,
-    defaultValues: config.initialValues || {},
-  })
-
-  // TanStack Query mutation for form submission
-  const submitMutation = useMutation({
-    mutationFn: async (values: Record<string, any>) => {
-      console.log("=== FORM SUBMIT HANDLER ===")
-      console.log("Values to submit:", values)
-      console.log("Form errors:", form.formState.errors)
-      console.log("Form is valid:", form.formState.isValid)
-      console.log("===========================")
-
-      await config.onSubmit(values)
-      return values
-    },
-    onSuccess: (values) => {
-      onSubmit?.(values)
-    },
-    onError: (error) => {
-      console.error("=== SUBMIT ERROR ===")
-      console.error("Error:", error)
-      console.error("====================")
-      onError?.(error)
-    },
-  })
-
-  // Combine external loading state with mutation loading state
-  const isLoading = loading || submitMutation.isPending
-
-  // Sync form values when initialValues change
-  useFormInitialValues(form, config.initialValues)
-
-  // Watch for form changes and call onChange callback
-  useFormChangeWatcher(form, config.onChange)
-
-  // Submit handler - delegates to mutation
-  const handleSubmit = async (values: Record<string, any>) => {
-    await submitMutation.mutateAsync(values)
-  }
-
-  // Cancel handler
-  const handleCancel = () => {
-    config.onCancel?.()
-    onCancel?.()
-  }
-
-  // Check if field should be visible - delegates to helper
-  const isFieldVisible = (field: FormFieldConfig) => {
-    return isFieldVisibleHelper(field, form.getValues())
-  }
-
-  // Expose methods via ref - uses helper to create handle
-  React.useImperativeHandle(ref, () => createFormBuilderHandle(form, handleSubmit))
-
-  // Render field based on type - delegates to FieldRenderer component
-  const renderField = (field: FormFieldConfig, index: number) => {
-    return (
-      <FieldRenderer
-        key={field.name + "_" + index}
-        field={field}
-        control={form.control}
-        isLoading={isLoading}
-        isFieldVisible={isFieldVisible}
-        children={children}
-      />
-    )
-  }
-
-  // Render field groups if provided
-  const renderFieldGroups = () => {
-    if (!config.fieldGroups) return null
-
-    return config.fieldGroups.map((group) => (
-      <CollapsibleFieldGroup
-        key={group.id}
-        title={group.title}
-        description={group.description}
-        defaultOpen={group.defaultOpen}
-        collapsible={group.collapsible}
-      >
-        <div className={config.formClass || "space-y-4"}>
-          {group.fields.map((field, index) => renderField(field, index))}
-        </div>
-      </CollapsibleFieldGroup>
-    ))
-  }
-
-  // Fields content
-  const fieldsContent = (
-    <>
-      {/* Render field groups */}
-      {config.fieldGroups && renderFieldGroups()}
-
-      {/* Render standalone fields */}
-      {config.fields && config.fields.map((field, index) => renderField(field, index))}
-
-      {/* Before actions slot */}
-      {children?.beforeActions}
-
-      {/* Form actions */}
-      {!config.hideActions && (
-        <div className={config.actionsClass || "flex justify-end gap-2 pt-4"}>
-          {children?.actions && typeof children.actions === "function" ? (
-            children.actions({ isLoading, handleCancel })
-          ) : (
-            <>
-              {config.showCancelButton && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  {config.cancelButtonText || t("cancel")}
-                </Button>
-              )}
-              <Button
-                type="submit"
-                disabled={isLoading || config.submitDisabled}
-                variant={config.submitVariant || "default"}
-                className={config.submitButtonClass}
-              >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {config.loadingText || t("loading")}
-                  </span>
-                ) : (
-                  config.submitText || t("submit")
-                )}
-              </Button>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* After actions slot */}
-      {children?.afterActions}
-    </>
-  )
-
-
-  // Render with form wrapper
+// Field Components - use react-hook-form's useFormContext
+function TextField(props: FieldProps) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(
-          handleSubmit,
-          (errors) => {
-            console.error("=== FORM VALIDATION FAILED ===")
-            console.error("Validation errors:", errors)
-            console.error("Form values:", form.getValues())
-            console.error("==============================")
-            onError?.(errors)
-          }
-        )}
-        className={config.formClass || "space-y-4"}
-      >
-        {fieldsContent}
-      </form>
-    </Form>
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "text" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
   )
-})
+}
 
-FormBuilder.displayName = "FormBuilder"
+function EmailField(props: FieldProps) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "email" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function PasswordField(props: FieldProps) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "password" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function TextareaField(props: FieldProps & { rows?: number }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "textarea" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function NumberField(props: FieldProps & { min?: number; max?: number; step?: number }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "number" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function SelectField(props: FieldProps & { options: { label: string; value: string }[] }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <TextInputField field={{ ...props, type: "select" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function PhoneField(props: FieldProps & { defaultCountry?: string }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <PhoneInputField field={{ ...props, type: "phone" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function FormCheckbox(props: FieldProps) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <CheckboxField field={{ ...props, type: "checkbox" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function FormSwitch(props: FieldProps) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <SwitchField field={{ ...props, type: "switch" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function RadioField(props: FieldProps & { options: { label: string; value: string }[] }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <RadioGroupField field={{ ...props, type: "radio" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function DateField(props: FieldProps & { minDate?: Date; maxDate?: Date; dateFormat?: string }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <DatePickerField field={{ ...props, type: "date-picker" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function ImageField(props: FieldProps & { organizationId?: string; mediaCategory?: any; maxSize?: number; previewAlt?: string; onUpload?: any }) {
+  const { control } = useFormContext()
+  const loading = React.useContext(LoadingContext)
+  return (
+    <FormField control={control} name={props.name} render={({ field }) => (
+      <ImageUploadField field={{ ...props, type: "image-upload" }} value={field.value} onChange={field.onChange} isLoading={loading} />
+    )} />
+  )
+}
+
+function SubmitButton({ children, loadingText, className }: { children?: React.ReactNode; loadingText?: string; className?: string }) {
+  const { t } = useTranslation('form')
+  const loading = React.useContext(LoadingContext)
+  return (
+    <Button type="submit" disabled={loading} className={className}>
+      {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{loadingText || t("loading")}</> : children || t("submit")}
+    </Button>
+  )
+}
+
+// Main FormBuilder
+interface FormBuilderProps {
+  children: React.ReactNode
+  onSubmit: (values: any) => Promise<void> | void
+  schema?: z.ZodTypeAny
+  defaultValues?: Record<string, any>
+  loading?: boolean
+  className?: string
+}
+
+function FormBuilderRoot({ children, onSubmit, schema, defaultValues = {}, loading = false, className = "space-y-4" }: FormBuilderProps) {
+  const form = useForm({
+    // @ts-ignore
+    resolver: schema ? zodResolver(schema) : undefined,
+    defaultValues,
+  })
+
+  const prev = React.useRef("")
+  React.useEffect(() => {
+    const str = JSON.stringify(defaultValues)
+    if (str !== prev.current) { form.reset(defaultValues); prev.current = str }
+  }, [defaultValues, form])
+
+  return (
+    <LoadingContext.Provider value={loading}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className={className}>{children}</form>
+      </Form>
+    </LoadingContext.Provider>
+  )
+}
+
+export const FormBuilder = Object.assign(FormBuilderRoot, {
+  Text: TextField,
+  Email: EmailField,
+  Password: PasswordField,
+  Textarea: TextareaField,
+  Number: NumberField,
+  Select: SelectField,
+  Phone: PhoneField,
+  Checkbox: FormCheckbox,
+  Switch: FormSwitch,
+  Radio: RadioField,
+  Date: DateField,
+  Image: ImageField,
+  Submit: SubmitButton,
+})

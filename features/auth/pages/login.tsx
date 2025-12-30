@@ -4,10 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { AuthCard } from '../components/AuthCard';
 import { useLogin } from '../hooks/useAuthActions';
-import {
-    createLoginFormConfig,
-    type LoginFormValues,
-} from '../lib/loginFormConfig';
+import { createLoginFormSchema, type LoginFormValues } from '../lib/loginFormConfig';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,8 +18,6 @@ export default function LoginPage() {
         });
     };
 
-    const formConfig = createLoginFormConfig(handleSubmit, t);
-
     return (
         <AuthCard
             title={t('login.title')}
@@ -30,19 +25,22 @@ export default function LoginPage() {
             footer={
                 <>
                     <span className="text-muted-foreground">{t('login.noAccount')} </span>
-                    <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        onClick={() => router.push('/register')}
-                        className="px-0 h-auto"
-                    >
+                    <Button type="button" variant="link" size="sm" onClick={() => router.push('/register')} className="px-0 h-auto">
                         {t('login.signUp')}
                     </Button>
                 </>
             }
         >
-            <FormBuilder config={formConfig} />
+            <FormBuilder
+                onSubmit={handleSubmit}
+                schema={createLoginFormSchema(t)}
+                defaultValues={{ emailOrPhone: '', password: '' }}
+                loading={loginMutation.isPending}
+            >
+                <FormBuilder.Text name="emailOrPhone" label={t('fields.emailOrPhone.label')} placeholder={t('fields.emailOrPhone.placeholder')} required />
+                <FormBuilder.Password name="password" label={t('fields.password.label')} placeholder={t('fields.password.placeholder')} required />
+                <FormBuilder.Submit className="w-full" loadingText={t('buttons.signingIn')}>{t('buttons.signIn')}</FormBuilder.Submit>
+            </FormBuilder>
         </AuthCard>
     );
 }

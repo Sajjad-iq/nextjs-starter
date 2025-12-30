@@ -4,10 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { AuthCard } from '../components/AuthCard';
 import { useRegister } from '../hooks/useAuthActions';
-import {
-    createRegisterFormConfig,
-    type RegisterFormValues,
-} from '../lib/registerFormConfig';
+import { createRegisterFormSchema, type RegisterFormValues } from '../lib/registerFormConfig';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -23,8 +20,6 @@ export default function RegisterPage() {
         });
     };
 
-    const formConfig = createRegisterFormConfig(handleSubmit, t);
-
     return (
         <AuthCard
             title={t('register.title')}
@@ -32,19 +27,25 @@ export default function RegisterPage() {
             footer={
                 <>
                     <span className="text-muted-foreground">{t('register.haveAccount')} </span>
-                    <Button
-                        type="button"
-                        variant="link"
-                        size="sm"
-                        onClick={() => router.push('/login')}
-                        className="px-0 h-auto"
-                    >
+                    <Button type="button" variant="link" size="sm" onClick={() => router.push('/login')} className="px-0 h-auto">
                         {t('register.signIn')}
                     </Button>
                 </>
             }
         >
-            <FormBuilder config={formConfig} />
+            <FormBuilder
+                onSubmit={handleSubmit}
+                schema={createRegisterFormSchema(t)}
+                defaultValues={{ name: '', email: '', phone: '', password: '', confirmPassword: '' }}
+                loading={registerMutation.isPending}
+            >
+                <FormBuilder.Text name="name" label={t('fields.name.label')} placeholder={t('fields.name.placeholder')} required />
+                <FormBuilder.Email name="email" label={t('fields.email.label')} placeholder={t('fields.email.placeholder')} required />
+                <FormBuilder.Phone name="phone" label={t('fields.phone.label')} placeholder={t('fields.phone.placeholder')} />
+                <FormBuilder.Password name="password" label={t('fields.password.label')} placeholder={t('fields.password.placeholder')} required />
+                <FormBuilder.Password name="confirmPassword" label={t('fields.confirmPassword.label')} placeholder={t('fields.confirmPassword.placeholder')} required />
+                <FormBuilder.Submit className="w-full" loadingText={t('buttons.creatingAccount')}>{t('buttons.createAccount')}</FormBuilder.Submit>
+            </FormBuilder>
         </AuthCard>
     );
 }

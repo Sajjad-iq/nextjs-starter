@@ -51,7 +51,6 @@ export const authService = {
     async register(
         name: string,
         email: string,
-        phoneCode: string,
         phone: string,
         password: string
     ): Promise<ApiResponse> {
@@ -60,7 +59,6 @@ export const authService = {
             const response = await axios.post('/auth/register', {
                 name,
                 email,
-                phoneCode,
                 phone,
                 password,
             });

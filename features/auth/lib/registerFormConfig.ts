@@ -14,7 +14,6 @@ export const createRegisterFormSchema = (t: TFunction<'auth'>) => z
       .min(1, t('validation.emailRequired'))
       .email(t('validation.emailInvalid')),
     phone: z.string().optional(),
-    phoneCode: z.string().optional(),
     password: z
       .string()
       .min(8, t('validation.passwordMinLength'))
@@ -49,12 +48,6 @@ export const createRegisterFormConfig = (
       required: true,
     },
     {
-      name: 'phoneCode',
-      type: 'hidden',
-      label: '',
-      required: false,
-    },
-    {
       name: 'phone',
       type: 'phone',
       label: t('fields.phone.label'),
@@ -82,7 +75,6 @@ export const createRegisterFormConfig = (
     name: '',
     email: '',
     phone: '',
-    phoneCode: '+964',
     password: '',
     confirmPassword: '',
   },

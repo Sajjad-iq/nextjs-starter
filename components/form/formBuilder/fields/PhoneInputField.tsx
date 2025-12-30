@@ -4,19 +4,17 @@ import type { PhoneFieldConfig } from "../types"
 
 interface PhoneInputFieldProps {
   field: PhoneFieldConfig
+  /** Combined phone value (e.g., "+964 7501234567") */
   value: string
-  phoneCode?: string
+  /** Called with combined phone number */
   onChange: (value: string) => void
-  onPhoneChange: (data: { phoneCode: string; phone: string; isValid: boolean }) => void
   isLoading: boolean
 }
 
 export function PhoneInputField({
   field,
   value,
-  phoneCode,
   onChange,
-  onPhoneChange,
   isLoading
 }: PhoneInputFieldProps) {
   return (
@@ -30,9 +28,7 @@ export function PhoneInputField({
       <FormControl>
         <PhoneInput
           value={value}
-          phoneCode={phoneCode}
           onChange={onChange}
-          onPhoneChange={onPhoneChange}
           disabled={isLoading || field.disabled}
           placeholder={field.placeholder}
           defaultCountry={field.defaultCountry || "IQ"}

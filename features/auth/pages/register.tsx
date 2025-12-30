@@ -18,7 +18,6 @@ export default function RegisterPage() {
         registerMutation.mutate({
             name: values.name,
             email: values.email,
-            phoneCode: values.phoneCode || '+964',
             phone: values.phone || '',
             password: values.password,
         });

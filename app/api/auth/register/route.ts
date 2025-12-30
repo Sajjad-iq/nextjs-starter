@@ -15,7 +15,7 @@ const users: Array<{
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, email, phoneCode, phone, password } = body;
+        const { name, email, phone, password } = body;
 
         // Check if email exists
         if (users.some(u => u.email === email)) {
@@ -25,12 +25,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create new user
+        // Create new user (phone is already combined like "+964 7501234567")
         const newUser = {
             id: Date.now().toString(),
             name,
             email,
-            phone: phone ? `${phoneCode}${phone}` : undefined,
+            phone: phone || undefined,
             password,
             isActivated: true,
             createdAt: new Date().toISOString(),

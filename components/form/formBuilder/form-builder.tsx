@@ -16,13 +16,11 @@ import { FieldRenderer } from "./compoents/FieldRenderer"
 // Import types
 import type {
   FormFieldConfig,
-  PhoneFieldConfig,
   FormBuilderProps,
 } from "./types"
 
 // Import helpers
 import {
-  handlePhoneInput as handlePhoneInputHelper,
   isFieldVisible as isFieldVisibleHelper,
   createFormBuilderHandle,
 } from "./helpers"
@@ -86,14 +84,6 @@ export const FormBuilder = React.forwardRef<
   // Watch for form changes and call onChange callback
   useFormChangeWatcher(form, config.onChange)
 
-  // Handle phone input - delegates to helper
-  const handlePhoneInput = (
-    data: { phoneCode: string; phone: string; isValid: boolean },
-    field: PhoneFieldConfig
-  ) => {
-    handlePhoneInputHelper(data, field, form)
-  }
-
   // Submit handler - delegates to mutation
   const handleSubmit = async (values: Record<string, any>) => {
     await submitMutation.mutateAsync(values)
@@ -122,8 +112,6 @@ export const FormBuilder = React.forwardRef<
         control={form.control}
         isLoading={isLoading}
         isFieldVisible={isFieldVisible}
-        handlePhoneInput={handlePhoneInput}
-        watch={form.watch}
         children={children}
       />
     )

@@ -137,7 +137,6 @@ export interface SelectFieldConfig extends BaseFieldConfig {
 export interface PhoneFieldConfig extends BaseFieldConfig {
   type: "phone"
   defaultCountry?: string
-  phoneCodeField?: string
 }
 
 // Checkbox field

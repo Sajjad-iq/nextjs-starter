@@ -1,22 +1,5 @@
 import type { UseFormReturn } from "react-hook-form"
-import type { FormFieldConfig, PhoneFieldConfig } from "./types"
-
-/**
- * Handles phone input changes and updates both phone and phoneCode fields
- */
-export const handlePhoneInput = (
-    data: { phoneCode: string; phone: string; isValid: boolean },
-    field: PhoneFieldConfig,
-    form: UseFormReturn<Record<string, any>>
-) => {
-    form.setValue(field.name, data.phone)
-    if (field.phoneCodeField) {
-        const phoneCodeWithPrefix = data.phoneCode.startsWith("+")
-            ? data.phoneCode
-            : "+" + data.phoneCode
-        form.setValue(field.phoneCodeField, phoneCodeWithPrefix)
-    }
-}
+import type { FormFieldConfig } from "./types"
 
 /**
  * Checks if a field should be visible based on its visibleWhen condition

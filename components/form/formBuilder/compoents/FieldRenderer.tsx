@@ -1,5 +1,5 @@
 import * as React from "react"
-import type { Control, UseFormWatch } from "react-hook-form"
+import type { Control } from "react-hook-form"
 import { FormField } from "@/components/ui/form"
 
 // Import field components
@@ -19,11 +19,6 @@ interface FieldRendererProps {
     control: Control<Record<string, any>>
     isLoading: boolean
     isFieldVisible: (field: FormFieldConfig) => boolean
-    handlePhoneInput: (
-        data: { phoneCode: string; phone: string; isValid: boolean },
-        field: PhoneFieldConfig
-    ) => void
-    watch: UseFormWatch<Record<string, any>>
     children?: React.ReactNode & {
         [key: string]: any
     }
@@ -37,8 +32,6 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     control,
     isLoading,
     isFieldVisible,
-    handlePhoneInput,
-    watch,
     children,
 }) => {
     // Check visibility
@@ -160,9 +153,6 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     // Phone input field
     if (field.type === "phone") {
         const phoneField = field as PhoneFieldConfig
-        const phoneCodeValue = phoneField.phoneCodeField
-            ? watch(phoneField.phoneCodeField)
-            : undefined
 
         return (
             <div key={field.name} className={field.containerClass}>
@@ -173,9 +163,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
                         <PhoneInputField
                             field={phoneField}
                             value={fieldProps.value}
-                            phoneCode={phoneCodeValue}
                             onChange={fieldProps.onChange}
-                            onPhoneChange={(data) => handlePhoneInput(data, phoneField)}
                             isLoading={isLoading}
                         />
                     )}

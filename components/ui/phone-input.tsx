@@ -61,13 +61,35 @@ const COUNTRIES = [
   { code: "GH", name: "Ghana", dialCode: "+233", flag: "🇬🇭" },
 ]
 
-export interface PhoneInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+export interface PhoneInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
+  /** Combined phone value (e.g., "+964 7501234567") */
   value?: string
-  phoneCode?: string
   defaultCountry?: string
-  onPhoneChange?: (data: { phoneCode: string; phone: string; isValid: boolean }) => void
+  /** Called with combined phone number (code + number) */
   onChange?: (value: string) => void
-  onPhoneCodeChange?: (phoneCode: string) => void
+}
+
+/**
+ * Parse a combined phone value into country code and local number
+ */
+function parsePhoneValue(value: string, defaultCountry: string): { countryCode: string; localNumber: string } {
+  if (!value) {
+    const country = COUNTRIES.find(c => c.code === defaultCountry) || COUNTRIES[0]
+    return { countryCode: country.code, localNumber: "" }
+  }
+
+  // Try to match the dial code at the start
+  const trimmed = value.trim()
+  for (const country of COUNTRIES) {
+    if (trimmed.startsWith(country.dialCode)) {
+      const localNumber = trimmed.slice(country.dialCode.length).trim()
+      return { countryCode: country.code, localNumber }
+    }
+  }
+
+  // No match found, use default country
+  const country = COUNTRIES.find(c => c.code === defaultCountry) || COUNTRIES[0]
+  return { countryCode: country.code, localNumber: trimmed.replace(/^\+\d+\s*/, "") }
 }
 
 const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
@@ -75,38 +97,34 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
     {
       className,
       value = "",
-      phoneCode = "+964",
       defaultCountry = "IQ",
       disabled,
       placeholder = "Enter your phone number",
-      onPhoneChange,
       onChange,
-      onPhoneCodeChange,
       ...props
     },
     ref
   ) => {
+    // Parse the combined value into parts
+    const { countryCode: initialCountryCode, localNumber: initialLocalNumber } = React.useMemo(
+      () => parsePhoneValue(value, defaultCountry),
+      [value, defaultCountry]
+    )
+
     const [selectedCountry, setSelectedCountry] = React.useState(() => {
-      // Find country by phone code or default country
-      const country = COUNTRIES.find(
-        (c) => c.dialCode === phoneCode || c.code === defaultCountry
-      )
-      return country || COUNTRIES[0]
+      return COUNTRIES.find(c => c.code === initialCountryCode) || COUNTRIES[0]
     })
-    const [phoneNumber, setPhoneNumber] = React.useState(value)
+    const [phoneNumber, setPhoneNumber] = React.useState(initialLocalNumber)
 
-    // Update phone number when value prop changes
+    // Update state when value prop changes externally
     React.useEffect(() => {
-      setPhoneNumber(value)
-    }, [value])
-
-    // Update selected country when phoneCode prop changes
-    React.useEffect(() => {
-      const country = COUNTRIES.find((c) => c.dialCode === phoneCode)
+      const { countryCode, localNumber } = parsePhoneValue(value, defaultCountry)
+      const country = COUNTRIES.find(c => c.code === countryCode)
       if (country) {
         setSelectedCountry(country)
       }
-    }, [phoneCode])
+      setPhoneNumber(localNumber)
+    }, [value, defaultCountry])
 
     // Basic validation - checks if phone number has at least 6 digits
     const isValid = React.useMemo(() => {
@@ -114,16 +132,17 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       return digitsOnly.length >= 6
     }, [phoneNumber])
 
+    // Combine and emit the full phone number
+    const emitCombinedValue = React.useCallback((dialCode: string, number: string) => {
+      const combined = number ? `${dialCode} ${number}`.trim() : ""
+      onChange?.(combined)
+    }, [onChange])
+
     const handleCountryChange = (countryCode: string) => {
       const country = COUNTRIES.find((c) => c.code === countryCode)
       if (country) {
         setSelectedCountry(country)
-        onPhoneCodeChange?.(country.dialCode)
-        onPhoneChange?.({
-          phoneCode: country.dialCode,
-          phone: phoneNumber,
-          isValid,
-        })
+        emitCombinedValue(country.dialCode, phoneNumber)
       }
     }
 
@@ -132,17 +151,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       // Only allow numbers, spaces, hyphens, and parentheses
       const sanitized = newValue.replace(/[^\d\s\-()]/g, "")
       setPhoneNumber(sanitized)
-      onChange?.(sanitized)
-
-      // Calculate validity with new value
-      const digitsOnly = sanitized.replace(/\D/g, "")
-      const valid = digitsOnly.length >= 6
-
-      onPhoneChange?.({
-        phoneCode: selectedCountry.dialCode,
-        phone: sanitized,
-        isValid: valid,
-      })
+      emitCombinedValue(selectedCountry.dialCode, sanitized)
     }
 
     return (

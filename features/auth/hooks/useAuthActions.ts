@@ -12,7 +12,6 @@ interface LoginCredentials {
 interface RegisterData {
     name: string;
     email: string;
-    phoneCode: string;
     phone: string;
     password: string;
 }
@@ -49,8 +48,8 @@ export function useRegister() {
     const authStore = useAuthStore();
 
     return useMutation({
-        mutationFn: ({ name, email, phoneCode, phone, password }: RegisterData) =>
-            authService.register(name, email, phoneCode, phone, password),
+        mutationFn: ({ name, email, phone, password }: RegisterData) =>
+            authService.register(name, email, phone, password),
         onSuccess: (result) => {
             if (result.success && result.data) {
                 authStore.setUser(result.data.user);

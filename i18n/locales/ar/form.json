@@ -1,0 +1,17 @@
+{
+    "cancel": "إلغاء",
+    "submit": "إرسال",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "reset": "إعادة تعيين",
+    "clear": "مسح",
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح",
+    "invalidPhone": "يرجى إدخال رقم هاتف صالح",
+    "minLength": "يجب أن يكون {{min}} أحرف على الأقل",
+    "maxLength": "يجب ألا يزيد عن {{max}} حرفًا",
+    "uploadImage": "رفع صورة",
+    "removeImage": "إزالة الصورة",
+    "selectDate": "اختر تاريخ",
+    "selectOption": "اختر خيارًا"
+}

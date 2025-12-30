@@ -1,0 +1,12 @@
+{
+    "theme": {
+        "toggleTheme": "تبديل المظهر",
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+    },
+    "datePicker": {
+        "subscriptionDate": "تاريخ الاشتراك",
+        "selectDate": "اختر تاريخ"
+    }
+}

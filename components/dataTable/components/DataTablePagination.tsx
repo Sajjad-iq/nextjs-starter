@@ -34,7 +34,7 @@ export function DataTablePagination<TData>({
   onPageChange,
   onPageSizeChange,
 }: DataTablePaginationProps<TData>) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('table')
 
   // Determine if using server-side pagination
   const isServerPagination = !!serverPagination && !!onPageChange
@@ -86,9 +86,9 @@ export function DataTablePagination<TData>({
 
   const paginationText = React.useMemo(() => {
     const total = dataLength
-    if (total === 0) return t("table.noItems")
-    if (total === 1) return t("table.item")
-    return t("table.totalItems", { count: total })
+    if (total === 0) return t("noItems")
+    if (total === 1) return t("item")
+    return t("totalItems", { count: total })
   }, [dataLength, t])
 
   return (
@@ -98,7 +98,7 @@ export function DataTablePagination<TData>({
         <span className="font-medium">{paginationText}</span>
         {table.getFilteredSelectedRowModel().rows.length > 0 && (
           <span className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-semibold">
-            {t("table.rowsSelected", {
+            {t("rowsSelected", {
               count: table.getFilteredSelectedRowModel().rows.length,
               total: table.getFilteredRowModel().rows.length
             })}
@@ -123,7 +123,7 @@ export function DataTablePagination<TData>({
             onClick={handleFirstPage}
             className="h-8"
           >
-            {t("table.first")}
+            {t("first")}
           </Button>
           <Button
             variant="outline"
@@ -132,10 +132,10 @@ export function DataTablePagination<TData>({
             onClick={handlePreviousPage}
             className="h-8"
           >
-            {t("table.previous")}
+            {t("previous")}
           </Button>
           <span className="text-sm font-medium px-3 py-1 rounded-md bg-muted">
-            {t("table.pageInfo", {
+            {t("pageInfo", {
               current: currentPage + 1,
               total: totalPages || 1
             })}
@@ -147,7 +147,7 @@ export function DataTablePagination<TData>({
             onClick={handleNextPage}
             className="h-8"
           >
-            {t("table.next")}
+            {t("next")}
           </Button>
           <Button
             variant="outline"
@@ -156,7 +156,7 @@ export function DataTablePagination<TData>({
             onClick={handleLastPage}
             className="h-8"
           >
-            {t("table.last")}
+            {t("last")}
           </Button>
         </div>
       </div>

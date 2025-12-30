@@ -2,19 +2,27 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 
-import enDashboard from './locales/en/dashboard.json'
-import arDashboard from './locales/ar/dashboard.json'
+import enCommon from './locales/en/common.json'
+import arCommon from './locales/ar/common.json'
 import enAuth from './locales/en/auth.json'
 import arAuth from './locales/ar/auth.json'
+import enTable from './locales/en/table.json'
+import arTable from './locales/ar/table.json'
+import enForm from './locales/en/form.json'
+import arForm from './locales/ar/form.json'
 
 const resources = {
   en: {
-    dashboard: enDashboard,
-    auth: enAuth
+    common: enCommon,
+    auth: enAuth,
+    table: enTable,
+    form: enForm
   },
   ar: {
-    dashboard: arDashboard,
-    auth: arAuth
+    common: arCommon,
+    auth: arAuth,
+    table: arTable,
+    form: arForm
   }
 }
 
@@ -31,8 +39,8 @@ i18n
     resources,
     fallbackLng: 'ar', // Fallback to Arabic if no language is detected
     lng: savedLanguage || 'ar', // Use saved language or default to Arabic
-    defaultNS: 'dashboard',
-    ns: ['dashboard', 'auth'],
+    defaultNS: 'common',
+    ns: ['common', 'auth', 'table', 'form'],
     debug: false,
 
     interpolation: {

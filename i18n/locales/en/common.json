@@ -1,0 +1,12 @@
+{
+    "theme": {
+        "toggleTheme": "Toggle theme",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+    },
+    "datePicker": {
+        "subscriptionDate": "Subscription Date",
+        "selectDate": "Select date"
+    }
+}

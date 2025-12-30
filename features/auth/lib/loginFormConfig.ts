@@ -35,11 +35,11 @@ export const createLoginFormConfig = (
     },
   ],
   validationSchema: createLoginFormSchema(t),
-  defaultValues: {
+  initialValues: {
     emailOrPhone: '',
     password: '',
   },
-  onSubmit,
+  onSubmit: onSubmit as (values: Record<string, any>) => Promise<void>,
   submitText: t('buttons.signIn'),
   loadingText: t('buttons.signingIn'),
   submitButtonClass: 'w-full',

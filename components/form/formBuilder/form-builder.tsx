@@ -46,7 +46,7 @@ export const FormBuilder = React.forwardRef<
   },
   FormBuilderProps
 >(({ config, loading = false, onSubmit, onCancel, onError, children }, ref) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation('form')
 
   const form = useForm<Record<string, any>>({
     // @ts-ignore - zodResolver type compatibility with optional schema
@@ -174,7 +174,7 @@ export const FormBuilder = React.forwardRef<
                   onClick={handleCancel}
                   disabled={isLoading}
                 >
-                  {config.cancelButtonText || t("form.cancel")}
+                  {config.cancelButtonText || t("cancel")}
                 </Button>
               )}
               <Button
@@ -186,10 +186,10 @@ export const FormBuilder = React.forwardRef<
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {config.loadingText || t("form.loading")}
+                    {config.loadingText || t("loading")}
                   </span>
                 ) : (
-                  config.submitText || t("form.submit")
+                  config.submitText || t("submit")
                 )}
               </Button>
             </>

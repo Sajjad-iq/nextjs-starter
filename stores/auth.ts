@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User, OrganizationResponse } from '@/types/global';
+import type { User } from '@/types/global';
 
 interface AuthState {
   // State

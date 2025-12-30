@@ -78,7 +78,7 @@ export const createRegisterFormConfig = (
     },
   ],
   validationSchema: createRegisterFormSchema(t),
-  defaultValues: {
+  initialValues: {
     name: '',
     email: '',
     phone: '',
@@ -86,7 +86,7 @@ export const createRegisterFormConfig = (
     password: '',
     confirmPassword: '',
   },
-  onSubmit,
+  onSubmit: onSubmit as (values: Record<string, any>) => Promise<void>,
   submitText: t('buttons.createAccount'),
   loadingText: t('buttons.creatingAccount'),
   submitButtonClass: 'w-full',

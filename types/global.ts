@@ -9,6 +9,14 @@ export interface User {
 
 
 /**
+ * Pagination parameters for API requests
+ */
+export interface PaginationParams {
+    page: number;
+    size: number;
+}
+
+/**
  * Pagination metadata for paginated API responses
  */
 export interface PaginationMeta {

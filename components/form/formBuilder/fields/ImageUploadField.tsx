@@ -1,5 +1,4 @@
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { ImageUpload, MediaCategory } from "@/components/common/image-upload"
 import type { ImageUploadFieldConfig } from "../types"
 
 interface ImageUploadFieldProps {

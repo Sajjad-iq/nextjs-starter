@@ -21,14 +21,14 @@ interface DataTableColumnVisibilityProps<TData> {
 export function DataTableColumnVisibility<TData>({
   table,
 }: DataTableColumnVisibilityProps<TData>) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('table')
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="text-xs sm:text-sm">
-          <span className="hidden sm:inline">{t("table.columns")}</span>
-          <span className="sm:hidden">{t("table.cols")}</span>
+          <span className="hidden sm:inline">{t('columns')}</span>
+          <span className="sm:hidden">{t('cols')}</span>
           <ChevronDown className="ms-1 sm:ms-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

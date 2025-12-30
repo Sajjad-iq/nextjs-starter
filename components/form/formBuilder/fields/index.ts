@@ -23,4 +23,3 @@ export { RadioGroupField } from './RadioGroupField';
 export { PhoneInputField } from './PhoneInputField';
 export { TextInputField } from './TextInputField';
 export { DatePickerField } from './DatePickerField';
-export { CategorySelectField } from './CategorySelectField';

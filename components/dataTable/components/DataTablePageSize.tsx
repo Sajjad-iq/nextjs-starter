@@ -25,7 +25,7 @@ export function DataTablePageSize<TData>({
   table,
   onPageSizeChange,
 }: DataTablePageSizeProps<TData>) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('table')
 
   const handlePageSizeChange = (value: string) => {
     const newSize = Number(value)
@@ -40,7 +40,7 @@ export function DataTablePageSize<TData>({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">{t("table.rowsPerPage")}</span>
+      <span className="text-sm text-muted-foreground">{t('rowsPerPage')}</span>
       <Select
         value={String(table.getState().pagination.pageSize)}
         onValueChange={handlePageSizeChange}

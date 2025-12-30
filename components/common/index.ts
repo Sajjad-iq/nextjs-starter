@@ -1,5 +1,6 @@
-export { UserAvatar, type UserAvatarProps } from "./user-avatar"
-export { ImageUpload, MediaCategory, type ImageUploadProps } from "./image-upload"
+// Commented out missing exports - add back when files are created
+// export { UserAvatar, type UserAvatarProps } from "./user-avatar"
+// export { ImageUpload, MediaCategory, type ImageUploadProps } from "./image-upload"
 export {
   DataTable,
   DataTableActionsDropdown,
@@ -13,11 +14,11 @@ export {
 export { Spinner } from "./Spinner"
 export { EmptyState } from "./EmptyState"
 export { ErrorState } from "./ErrorState"
-export { InfoField } from "./InfoField"
-export { InfoFieldMultiline } from "./InfoFieldMultiline"
-export {
-  BulkUploadDialog,
-  type BulkImportResultBase,
-  type BulkImportFailedRow,
-  type SummaryField,
-} from "./BulkUploadDialog"
+// export { InfoField } from "./InfoField"
+// export { InfoFieldMultiline } from "./InfoFieldMultiline"
+// export {
+//   BulkUploadDialog,
+//   type BulkImportResultBase,
+//   type BulkImportFailedRow,
+//   type SummaryField,
+// } from "./BulkUploadDialog"

@@ -26,7 +26,7 @@ export function DataTableContent<TData, TValue>({
   columns,
   isRTL = false,
 }: DataTableContentProps<TData, TValue>) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('table')
 
   return (
     <div className="h-full bg-card border border-border rounded-xl overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -65,7 +65,7 @@ export function DataTableContent<TData, TValue>({
             ) : (
               <TableRow className="hover:bg-transparent border-0">
                 <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
-                  {t("table.noResults")}
+                  {t('noResults')}
                 </TableCell>
               </TableRow>
             )}

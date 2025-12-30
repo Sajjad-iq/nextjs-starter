@@ -30,7 +30,7 @@ export function DataTableCardView<TData>({
   cardWidth,
   aspectRatio = "auto",
 }: DataTableCardViewProps<TData>) {
-  const { t } = useTranslation()
+  const { t } = useTranslation('table')
   const rows = table.getRowModel().rows
 
   // Grid column classes based on column count
@@ -59,7 +59,7 @@ export function DataTableCardView<TData>({
   if (!rows.length) {
     return (
       <div className="flex items-center justify-center h-64 text-center text-muted-foreground">
-        {t("table.noResults")}
+        {t("noResults")}
       </div>
     )
   }

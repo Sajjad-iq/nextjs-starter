@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { usersService } from '../services/usersService';
 import type { UsersResponse } from '../lib/types';
-import type { ServerPaginationState, PaginationChangeEvent } from '@/components/dataTable';
+import type { ServerPaginationState } from '@/components/dataTable';
 
 interface UseUsersOptions {
     initialPage?: number;
@@ -13,29 +13,27 @@ interface UseUsersOptions {
 export function useUsers(options: UseUsersOptions = {}) {
     const { initialPage = 0, initialSize = 10, search } = options;
 
-    const [pagination, setPagination] = useState({
-        page: initialPage,
-        size: initialSize,
-    });
+    const [page, setPage] = useState(initialPage);
+    const [size, setSize] = useState(initialSize);
 
     const mutation = useMutation<UsersResponse, Error, { page: number; size: number; search?: string }>({
         mutationFn: (params) => usersService.getUsers(params),
     });
 
-    // Fetch on mount and when pagination changes
     useEffect(() => {
-        mutation.mutate({ ...pagination, search });
-    }, [pagination.page, pagination.size, search]);
+        mutation.mutate({ page, size, search });
+    }, [page, size, search]);
 
-    const handlePaginate = useCallback((event: PaginationChangeEvent) => {
-        setPagination(prev => ({
-            // Reset page to 0 when size changes
-            page: event.size !== undefined ? 0 : (event.page ?? prev.page),
-            size: event.size !== undefined ? event.size : prev.size,
-        }));
+    const handlePageChange = useCallback((newPage: number) => {
+        setPage(newPage);
     }, []);
 
-    const serverPagination: ServerPaginationState | undefined = mutation.data?.data
+    const handlePageSizeChange = useCallback((newSize: number) => {
+        setSize(newSize);
+        setPage(0); // Reset to first page when size changes
+    }, []);
+
+    const pagination: ServerPaginationState | undefined = mutation.data?.data
         ? {
             page: mutation.data.data.page,
             size: mutation.data.data.size,
@@ -49,8 +47,9 @@ export function useUsers(options: UseUsersOptions = {}) {
         isLoading: mutation.isPending,
         isError: mutation.isError,
         error: mutation.error,
-        refetch: () => mutation.mutate({ ...pagination, search }),
-        serverPagination,
-        onPaginate: handlePaginate,
+        refetch: () => mutation.mutate({ page, size, search }),
+        pagination,
+        onPageChange: handlePageChange,
+        onPageSizeChange: handlePageSizeChange,
     };
 }

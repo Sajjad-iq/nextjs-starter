@@ -1,4 +1,4 @@
-export { DataTable, type DataTableProps, type ServerPaginationState, type PaginationChangeEvent } from "./DataTable"
+export { DataTable, type DataTableProps, type ServerPaginationState } from "./DataTable"
 
 export {
   DataTableToolbar,

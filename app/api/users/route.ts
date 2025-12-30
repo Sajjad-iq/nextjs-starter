@@ -3,7 +3,6 @@ import { mockUsers } from './_data';
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-
     const page = parseInt(searchParams.get('page') || '0');
     const size = parseInt(searchParams.get('size') || '10');
     const search = searchParams.get('search') || '';
@@ -18,12 +17,10 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    // Calculate pagination
+    // Paginate
     const totalElements = filteredUsers.length;
     const totalPages = Math.ceil(totalElements / size);
-    const start = page * size;
-    const end = start + size;
-    const paginatedUsers = filteredUsers.slice(start, end);
+    const content = filteredUsers.slice(page * size, (page + 1) * size);
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -31,7 +28,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
         success: true,
         data: {
-            content: paginatedUsers,
+            content,
             page,
             size,
             totalElements,

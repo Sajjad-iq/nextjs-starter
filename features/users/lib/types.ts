@@ -21,12 +21,6 @@ export interface UsersData {
 export type UsersResponse = ApiResponse<UsersData>;
 export type UserResponse = ApiResponse<User>;
 
-export interface UsersParams {
-    page: number;
-    size: number;
-    search?: string;
-}
-
 export interface UserFormValues {
     name: string;
     email: string;

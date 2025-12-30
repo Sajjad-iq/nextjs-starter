@@ -1,8 +1,14 @@
 import { httpService } from '@/lib/config/http';
-import type { UsersResponse, UserResponse, UsersParams, UserFormValues } from '../lib/types';
+import type { UsersResponse, UserResponse, UserFormValues } from '../lib/types';
+
+interface GetUsersParams {
+    page?: number;
+    size?: number;
+    search?: string;
+}
 
 export const usersService = {
-    async getUsers(params: UsersParams): Promise<UsersResponse> {
+    async getUsers(params?: GetUsersParams): Promise<UsersResponse> {
         const axios = httpService.getAxiosInstance();
         const response = await axios.get('/users', { params });
         return response.data;

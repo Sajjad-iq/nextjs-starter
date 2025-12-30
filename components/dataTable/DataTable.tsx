@@ -1,7 +1,6 @@
 import type { VisibilityState, ColumnDef } from "@tanstack/react-table"
 import {
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -21,21 +20,17 @@ export interface ServerPaginationState {
   totalPages: number
 }
 
-export interface PaginationChangeEvent {
-  page?: number
-  size?: number
-}
-
 export interface DataTableProps<TData, TValue> {
   data: TData[]
   columns: ColumnDef<TData, TValue>[]
   initialColumnVisibility?: VisibilityState
   toolbar?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode
   actions?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode
-  serverPagination?: ServerPaginationState
-  onPaginate?: (event: PaginationChangeEvent) => void
   isLoading?: boolean
   onRetry?: () => void
+  pagination?: ServerPaginationState
+  onPageChange?: (page: number) => void
+  onPageSizeChange?: (size: number) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -44,41 +39,29 @@ export function DataTable<TData, TValue>({
   initialColumnVisibility = {},
   toolbar,
   actions,
-  serverPagination,
-  onPaginate,
   isLoading = false,
   onRetry,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation('table')
-  const isServerPagination = !!serverPagination && !!onPaginate
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: isServerPagination ? undefined : getPaginationRowModel(),
-    manualPagination: isServerPagination,
-    pageCount: isServerPagination ? serverPagination.totalPages : undefined,
-    initialState: {
+    manualPagination: true,
+    pageCount: pagination?.totalPages ?? 0,
+    state: {
       columnVisibility: initialColumnVisibility,
-      pagination: { pageIndex: 0, pageSize: 20 },
+      pagination: {
+        pageIndex: pagination?.page ?? 0,
+        pageSize: pagination?.size ?? 20,
+      },
     },
-    state: isServerPagination ? {
-      pagination: { pageIndex: serverPagination.page, pageSize: serverPagination.size },
-    } : undefined,
   })
-
-  const handlePageChange = (page: number) => onPaginate?.({ page })
-  const handlePageSizeChange = (size: number) => {
-    if (isServerPagination) {
-      onPaginate?.({ size })
-    } else {
-      table.setPageSize(size)
-    }
-  }
-
-  const totalElements = isServerPagination ? serverPagination.totalElements : data.length
 
   const renderContent = () => {
     if (!isLoading && data.length === 0 && onRetry) {
@@ -109,10 +92,9 @@ export function DataTable<TData, TValue>({
       <div className="flex-shrink-0">
         <DataTablePagination
           table={table}
-          dataLength={totalElements}
-          serverPagination={serverPagination}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
+          totalElements={pagination?.totalElements ?? 0}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
         />
       </div>
     </div>

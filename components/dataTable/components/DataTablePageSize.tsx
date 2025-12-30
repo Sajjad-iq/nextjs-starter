@@ -15,35 +15,18 @@ interface DataTablePageSizeProps<TData> {
   onPageSizeChange?: (size: number) => void
 }
 
-/**
- * DataTable Page Size Component
- *
- * Selector for changing the number of rows per page
- * Supports both client-side and server-side pagination
- */
 export function DataTablePageSize<TData>({
   table,
   onPageSizeChange,
 }: DataTablePageSizeProps<TData>) {
   const { t } = useTranslation('table')
 
-  const handlePageSizeChange = (value: string) => {
-    const newSize = Number(value)
-    if (onPageSizeChange) {
-      // Server-side pagination
-      onPageSizeChange(newSize)
-    } else {
-      // Client-side pagination
-      table.setPageSize(newSize)
-    }
-  }
-
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground">{t('rowsPerPage')}</span>
       <Select
         value={String(table.getState().pagination.pageSize)}
-        onValueChange={handlePageSizeChange}
+        onValueChange={(value) => onPageSizeChange?.(Number(value))}
       >
         <SelectTrigger className="w-[70px]">
           <SelectValue />

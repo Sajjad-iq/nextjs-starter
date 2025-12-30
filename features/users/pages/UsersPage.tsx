@@ -13,8 +13,9 @@ export default function UsersPage() {
         users,
         isLoading,
         refetch,
-        serverPagination,
-        onPaginate,
+        pagination,
+        onPageChange,
+        onPageSizeChange,
     } = useUsers();
 
     const columns = useMemo(
@@ -41,10 +42,11 @@ export default function UsersPage() {
                 <DataTable
                     data={users}
                     columns={columns}
-                    serverPagination={serverPagination}
-                    onPaginate={onPaginate}
                     isLoading={isLoading}
-                    onRetry={() => refetch()}
+                    onRetry={refetch}
+                    pagination={pagination}
+                    onPageChange={onPageChange}
+                    onPageSizeChange={onPageSizeChange}
                 />
             </div>
         </div>

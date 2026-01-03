@@ -162,7 +162,7 @@ function SubmitButton({ children, loadingText, className }: { children?: React.R
 }
 
 // Main FormBuilder
-interface FormBuilderProps {
+export interface FormBuilderProps {
   children: React.ReactNode
   onSubmit: (values: any) => Promise<void> | void
   schema?: z.ZodTypeAny

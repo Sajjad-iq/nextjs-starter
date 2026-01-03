@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { ApiResponse } from '@/lib/types/global';
-
-// Shared user storage (same as login)
-const users: Array<{
-    id: string;
-    name: string;
-    email: string;
-    phone?: string;
-    password: string;
-    isActivated: boolean;
-    createdAt: string;
-}> = [];
+import { mockUsers } from '../../users/_data';
 
 export async function POST(request: NextRequest) {
     try {
@@ -18,38 +8,56 @@ export async function POST(request: NextRequest) {
         const { name, email, phone, password } = body;
 
         // Check if email exists
-        if (users.some(u => u.email === email)) {
+        if (mockUsers.some(u => u.email === email)) {
             return NextResponse.json<ApiResponse>(
                 { success: false, message: 'Email already registered', errorCode: 'EMAIL_EXISTS' },
                 { status: 400 }
             );
         }
 
-        // Create new user (phone is already combined like "+964 7501234567")
+        // Check if phone exists (if provided)
+        if (phone && mockUsers.some(u => u.phone === phone)) {
+            return NextResponse.json<ApiResponse>(
+                { success: false, message: 'Phone number already registered', errorCode: 'PHONE_EXISTS' },
+                { status: 400 }
+            );
+        }
+
+        // Create new user
         const newUser = {
-            id: Date.now().toString(),
+            id: `user-${mockUsers.length + 1}`,
             name,
             email,
-            phone: phone || undefined,
-            password,
-            isActivated: true,
+            phone: phone || `+964 750${String(1000000 + mockUsers.length).slice(1)}`,
+            role: 'user' as const,
+            status: 'active' as const,
             createdAt: new Date().toISOString(),
         };
 
-        users.push(newUser);
-
-        // Remove password from response
-        const { password: _, ...userWithoutPassword } = newUser;
+        // Add to mock users
+        mockUsers.push(newUser);
 
         // Generate dummy token
         const token = 'token_' + Math.random().toString(36).substring(2);
+
+        // Prepare user data for response
+        const userData = {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            phone: newUser.phone,
+            role: newUser.role,
+            status: newUser.status,
+            isActivated: true,
+            createdAt: newUser.createdAt,
+        };
 
         // Create response
         const response = NextResponse.json<ApiResponse>({
             success: true,
             message: 'Registration successful!',
             data: {
-                user: userWithoutPassword,
+                user: userData,
                 token,
             },
         });
@@ -63,7 +71,7 @@ export async function POST(request: NextRequest) {
             path: '/',
         });
 
-        response.cookies.set('current_user', JSON.stringify(userWithoutPassword), {
+        response.cookies.set('current_user', JSON.stringify(userData), {
             httpOnly: false, // Accessible by client for UI
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',

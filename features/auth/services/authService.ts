@@ -1,5 +1,5 @@
 import { httpService } from '@/lib/config/http';
-import type { User, ApiResponse } from '@/types/global';
+import type { User, ApiResponse } from '@/lib/types/global';
 
 interface LoginResponse {
     user: User;

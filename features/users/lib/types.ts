@@ -1,4 +1,4 @@
-import type { ApiResponse } from '@/types/global';
+import type { ApiResponse } from '@/lib/types/global';
 
 export interface User {
     id: string;

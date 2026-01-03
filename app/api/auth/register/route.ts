@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { ApiResponse } from '@/types/global';
+import type { ApiResponse } from '@/lib/types/global';
 
 // Shared user storage (same as login)
 const users: Array<{

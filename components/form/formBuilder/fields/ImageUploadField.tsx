@@ -1,7 +1,6 @@
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { ImageUpload } from "@/components/ui/image-upload"
+import { ImageUpload, MediaCategory } from "@/components/ui/image-upload"
 import type { ImageUploadFieldConfig } from "../types"
-import { MediaCategory } from "../types"
 
 interface ImageUploadFieldProps {
   field: ImageUploadFieldConfig
@@ -23,8 +22,7 @@ export function ImageUploadField({ field, value, onChange, isLoading }: ImageUpl
         <ImageUpload
           value={value}
           onChange={onChange}
-          organizationId={field.organizationId || ""}
-          category={field.mediaCategory || MediaCategory.PRODUCT}
+          category={field.mediaCategory || MediaCategory.IMAGE}
           maxSize={field.maxSize || 5}
           previewAlt={field.previewAlt || "Image preview"}
           disabled={isLoading || field.disabled}

@@ -1,15 +1,65 @@
 "use client"
 
 import * as React from "react"
-import { X, ImageIcon } from "lucide-react"
+import { X, Image, Video, FileText, Folder, FileType, Archive } from "lucide-react"
+import { useMutation } from "@tanstack/react-query"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { MediaCategory } from "@/components/form/formBuilder/types"
+
+// Media categories - generic file types
+export enum MediaCategory {
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+  DOCUMENT = 'DOCUMENT',
+  PDF = 'PDF',
+  FOLDER = 'FOLDER',
+  ARCHIVE = 'ARCHIVE',
+}
+
+// Category-specific configurations
+const CATEGORY_CONFIG = {
+  [MediaCategory.IMAGE]: {
+    icon: Image,
+    accept: "image/*",
+    maxSize: 5, // 5MB for images
+    label: "image",
+  },
+  [MediaCategory.VIDEO]: {
+    icon: Video,
+    accept: "video/*",
+    maxSize: 50, // 50MB for videos
+    label: "video",
+  },
+  [MediaCategory.DOCUMENT]: {
+    icon: FileText,
+    accept: ".doc,.docx,.txt,.rtf",
+    maxSize: 10, // 10MB for documents
+    label: "document",
+  },
+  [MediaCategory.PDF]: {
+    icon: FileType,
+    accept: "application/pdf",
+    maxSize: 10, // 10MB for PDFs
+    label: "PDF",
+  },
+  [MediaCategory.FOLDER]: {
+    icon: Folder,
+    accept: "*/*", // Accept all files for folder/general uploads
+    maxSize: 20, // 20MB for general files
+    label: "file",
+  },
+  [MediaCategory.ARCHIVE]: {
+    icon: Archive,
+    accept: ".zip,.rar,.7z,.tar,.gz",
+    maxSize: 100, // 100MB for archives
+    label: "archive",
+  },
+} as const
 
 export interface ImageUploadProps {
   value?: string
   onChange: (value: string) => void
-  organizationId?: string
   category?: MediaCategory
   maxSize?: number
   previewAlt?: string
@@ -17,8 +67,6 @@ export interface ImageUploadProps {
   onUpload?: (
     file: File,
     category: MediaCategory,
-    organizationId: string,
-    entityId?: string
   ) => Promise<{ success: boolean; data?: { url: string }; error?: string }>
   className?: string
 }
@@ -26,17 +74,43 @@ export interface ImageUploadProps {
 export function ImageUpload({
   value,
   onChange,
-  organizationId = "",
-  category = MediaCategory.PRODUCT,
-  maxSize = 5,
+  category = MediaCategory.IMAGE,
+  maxSize: customMaxSize,
   previewAlt = "Image preview",
   disabled = false,
   onUpload,
   className,
 }: ImageUploadProps) {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Get category-specific config
+  const config = CATEGORY_CONFIG[category]
+  const maxSize = customMaxSize ?? config.maxSize
+  const Icon = config.icon
+
+  // Upload mutation
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (onUpload) {
+        const result = await onUpload(file, category)
+        if (result.success && result.data?.url) {
+          return result.data.url
+        } else {
+          throw new Error(result.error || "Upload failed")
+        }
+      } else {
+        // Fallback: create a local URL for preview
+        return URL.createObjectURL(file)
+      }
+    },
+    onSuccess: (url) => {
+      onChange(url)
+      toast.success(`${config.label.charAt(0).toUpperCase() + config.label.slice(1)} uploaded successfully`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || `Failed to upload ${config.label}`)
+    },
+  })
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -45,37 +119,25 @@ export function ImageUpload({
     // Validate file size
     const fileSizeMB = file.size / (1024 * 1024)
     if (fileSizeMB > maxSize) {
-      setError(`File size must be less than ${maxSize}MB`)
+      toast.error(`File size must be less than ${maxSize}MB`)
       return
     }
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file")
+    // Validate file type based on category
+    const acceptedTypes = config.accept.split(',').map(t => t.trim())
+    const isValidType = acceptedTypes.some(type => {
+      if (type === "image/*") return file.type.startsWith("image/")
+      if (type === "application/pdf") return file.type === "application/pdf"
+      if (type.startsWith(".")) return file.name.toLowerCase().endsWith(type)
+      return file.type === type
+    })
+
+    if (!isValidType) {
+      toast.error(`Please upload a valid ${config.label}`)
       return
     }
 
-    setError(null)
-    setIsLoading(true)
-
-    try {
-      if (onUpload) {
-        const result = await onUpload(file, category, organizationId)
-        if (result.success && result.data?.url) {
-          onChange(result.data.url)
-        } else {
-          setError(result.error || "Upload failed")
-        }
-      } else {
-        // Fallback: create a local URL for preview
-        const url = URL.createObjectURL(file)
-        onChange(url)
-      }
-    } catch (err) {
-      setError("Upload failed")
-    } finally {
-      setIsLoading(false)
-    }
+    uploadMutation.mutate(file)
   }
 
   const handleRemove = () => {
@@ -90,9 +152,9 @@ export function ImageUpload({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={config.accept}
         onChange={handleFileChange}
-        disabled={disabled || isLoading}
+        disabled={disabled || uploadMutation.isPending}
         className="hidden"
       />
 
@@ -119,25 +181,23 @@ export function ImageUpload({
         <Button
           type="button"
           variant="outline"
-          disabled={disabled || isLoading}
+          disabled={disabled || uploadMutation.isPending}
           onClick={() => inputRef.current?.click()}
           className="h-32 w-full border-dashed"
         >
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            {isLoading ? (
+            {uploadMutation.isPending ? (
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
             ) : (
               <>
-                <ImageIcon className="h-8 w-8" />
-                <span className="text-sm">Click to upload image</span>
+                <Icon className="h-8 w-8" />
+                <span className="text-sm">Click to upload {config.label}</span>
                 <span className="text-xs">Max size: {maxSize}MB</span>
               </>
             )}
           </div>
         </Button>
       )}
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { MediaCategory } from "@/components/ui/image-upload"
+
 // Base field props
 export interface BaseFieldConfig {
   name: string
@@ -62,15 +64,12 @@ export interface DatePickerFieldConfig extends BaseFieldConfig {
 // Image upload field
 export interface ImageUploadFieldConfig extends BaseFieldConfig {
   type: "image-upload"
-  organizationId?: string
   mediaCategory?: MediaCategory
   maxSize?: number
   previewAlt?: string
   onUpload?: (
     file: File,
     category: MediaCategory,
-    organizationId: string,
-    entityId?: string
   ) => Promise<{ success: boolean; data?: { url: string }; error?: string }>
 }
 
@@ -85,13 +84,3 @@ export type FormFieldConfig =
   | RadioFieldConfig
   | DatePickerFieldConfig
   | ImageUploadFieldConfig
-
-// Media enums
-export enum MediaCategory {
-  PROFILE = 'PROFILE',
-  PRODUCT = 'PRODUCT',
-  ORGANIZATION = 'ORGANIZATION',
-  INVOICE = 'INVOICE',
-  DOCUMENT = 'DOCUMENT',
-  OTHER = 'OTHER',
-}

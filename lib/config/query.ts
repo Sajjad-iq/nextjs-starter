@@ -30,34 +30,6 @@ export const queryClient = new QueryClient({
 });
 
 /**
- * Query Key Factories
- * Centralized query keys for consistency and type safety
- */
-export const queryKeys = {
-
-  // Items
-  items: {
-    all: ['items'] as const,
-    lists: () => [...queryKeys.items.all, 'list'] as const,
-    list: (organizationId: string, page: number, size: number, activeOnly = false) =>
-      [...queryKeys.items.lists(), organizationId, page, size, activeOnly] as const,
-    details: () => [...queryKeys.items.all, 'detail'] as const,
-    detail: (id: string) => [...queryKeys.items.details(), id] as const,
-    withSetup: (id: string) => [...queryKeys.items.details(), id, 'setup'] as const,
-  },
-
-  // Stock
-  stock: {
-    all: ['stock'] as const,
-    lists: () => [...queryKeys.stock.all, 'list'] as const,
-    list: (itemId: string, page: number, size: number) =>
-      [...queryKeys.stock.lists(), itemId, page, size] as const,
-    details: () => [...queryKeys.stock.all, 'detail'] as const,
-    detail: (itemId: string, stockId: string) => [...queryKeys.stock.details(), itemId, stockId] as const,
-  },
-};
-
-/**
  * Query Utility Functions
  */
 export const queryUtils = {
@@ -74,32 +46,5 @@ export const queryUtils = {
    */
   resetAll: () => {
     queryClient.resetQueries();
-  },
-
-  /**
-   * Invalidate all items queries
-   */
-  invalidateItems: () => {
-    return queryClient.invalidateQueries({
-      queryKey: queryKeys.items.all,
-    });
-  },
-
-  /**
-   * Invalidate items list for an organization
-   */
-  invalidateItemsList: (organizationId: string) => {
-    return queryClient.invalidateQueries({
-      queryKey: [...queryKeys.items.lists(), organizationId],
-    });
-  },
-
-  /**
-   * Invalidate all stock queries for an item
-   */
-  invalidateStock: (itemId: string) => {
-    return queryClient.invalidateQueries({
-      queryKey: [...queryKeys.stock.lists(), itemId],
-    });
   },
 };

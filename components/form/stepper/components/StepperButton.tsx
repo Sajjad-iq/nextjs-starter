@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { useStepperContext } from './context'
-import type { StepperButtonProps } from './types'
+import { useStepperContext } from '../context'
+import type { StepperButtonProps } from '../types'
 
 export const StepperButton = ({ direction, children, ...props }: StepperButtonProps) => {
     const { goToNext, goToPrevious, isFirstStep, isLastStep } = useStepperContext()

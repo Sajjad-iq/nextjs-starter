@@ -3,10 +3,7 @@
 // export { ImageUpload, MediaCategory, type ImageUploadProps } from "./image-upload"
 export {
   DataTable,
-  DataTableActionsDropdown,
   type DataTableProps,
-  type ActionItem,
-  type ActionGroup,
 } from "../dataTable"
 export { Spinner } from "./Spinner"
 export { EmptyState } from "./EmptyState"
